@@ -1,0 +1,32 @@
+[
+  {
+    "question": "Which layer of the OSI model is responsible for end-to-end reliable transmission and port numbers?",
+    "options": ["Network Layer", "Data Link Layer", "Transport Layer", "Session Layer"],
+    "correctAnswer": "Transport Layer",
+    "explanation": "The Transport Layer handles TCP/UDP protocols and process-to-process communication via ports."
+  },
+  {
+    "question": "What is the time complexity of searching an element in a balanced Binary Search Tree (AVL / Red-Black)?",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
+    "correctAnswer": "O(log n)",
+    "explanation": "Because height of a balanced BST is O(log n), search operations take logarithmic time."
+  },
+  {
+    "question": "In Operating Systems, which of the following is NOT one of the 4 conditions for Deadlock?",
+    "options": ["Mutual Exclusion", "Hold and Wait", "Preemption allowed", "Circular Wait"],
+    "correctAnswer": "Preemption allowed",
+    "explanation": "Deadlock requires No Preemption. If preemption is allowed, deadlocks can be avoided."
+  },
+  {
+    "question": "In SQL, which command is used to permanently remove all rows from a table without logging individual row deletes?",
+    "options": ["DELETE FROM", "DROP TABLE", "TRUNCATE TABLE", "CLEAR TABLE"],
+    "correctAnswer": "TRUNCATE TABLE",
+    "explanation": "TRUNCATE is a DDL command that deallocates data pages quickly."
+  },
+  {
+    "question": "Which CPU scheduling algorithm gives the minimum average waiting time for a given set of processes?",
+    "options": ["First-Come, First-Served (FCFS)", "Round Robin (RR)", "Shortest Job First (SJF)", "Priority Scheduling"],
+    "correctAnswer": "Shortest Job First (SJF)",
+    "explanation": "SJF is provably optimal for minimizing average process waiting time."
+  }
+]

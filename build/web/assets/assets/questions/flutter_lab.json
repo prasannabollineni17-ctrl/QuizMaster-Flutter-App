@@ -1,0 +1,72 @@
+[
+  {
+    "question": "Which programming language is used to build Flutter applications?",
+    "options": ["Kotlin", "Dart", "Swift", "TypeScript"],
+    "correctAnswer": "Dart",
+    "explanation": "Flutter is written in Dart, developed by Google."
+  },
+  {
+    "question": "What is the primary difference between StatelessWidget and StatefulWidget in Flutter?",
+    "options": [
+      "StatelessWidget cannot be rebuilt; StatefulWidget can be rebuilt any time",
+      "StatelessWidget is immutable; StatefulWidget maintains mutable state across rebuilds",
+      "StatelessWidget is for Android; StatefulWidget is for iOS",
+      "StatelessWidget does not have a build method"
+    ],
+    "correctAnswer": "StatelessWidget is immutable; StatefulWidget maintains mutable state across rebuilds",
+    "explanation": "StatelessWidgets have final configurations, while StatefulWidgets persist mutable state via the State object."
+  },
+  {
+    "question": "Which method in Flutter is called when the state object is created and inserted into the tree?",
+    "options": ["build()", "initState()", "dispose()", "setState()"],
+    "correctAnswer": "initState()",
+    "explanation": "initState() is called once when the State object is inserted into the widget tree."
+  },
+  {
+    "question": "Which widget is best suited for building a scrollable, high-performance list of dynamic items?",
+    "options": ["SingleChildScrollView", "Column", "ListView.builder", "Stack"],
+    "correctAnswer": "ListView.builder",
+    "explanation": "ListView.builder uses on-demand viewport rendering to save memory for long or infinite lists."
+  },
+  {
+    "question": "What does calling setState() inside a State class do?",
+    "options": [
+      "Terminates the application",
+      "Saves state to local SQLite storage",
+      "Notifies the framework that internal state changed and schedules a build()",
+      "Re-executes the main() function"
+    ],
+    "correctAnswer": "Notifies the framework that internal state changed and schedules a build()",
+    "explanation": "setState marks the element as dirty, instructing Flutter to re-render the widget."
+  },
+  {
+    "question": "What widget creates a smooth shared element transition when navigating between two screens?",
+    "options": ["AnimatedContainer", "Hero", "Transform", "FadeTransition"],
+    "correctAnswer": "Hero",
+    "explanation": "The Hero widget animates an element from one route to another during navigation."
+  },
+  {
+    "question": "Which Flutter tool injects updated code directly into the running Dart VM without restarting state?",
+    "options": ["Hot Restart", "Full Rebuild", "Hot Reload", "JIT Profiler"],
+    "correctAnswer": "Hot Reload",
+    "explanation": "Hot Reload preserves the app's current state while loading new widget code."
+  },
+  {
+    "question": "Which widget allows user swipe gestures to delete or dismiss items from a list?",
+    "options": ["Draggable", "Dismissible", "GestureDetector", "InkWell"],
+    "correctAnswer": "Dismissible",
+    "explanation": "Dismissible wraps any child widget and provides customizable left/right swipe-to-dismiss behavior."
+  },
+  {
+    "question": "In Dart, what keyword is used to wait for an asynchronous Future operation to complete?",
+    "options": ["defer", "yield", "await", "promise"],
+    "correctAnswer": "await",
+    "explanation": "await pauses execution until the Future resolves and unpacks its value."
+  },
+  {
+    "question": "Which class is used in Flutter to decode raw JSON string into Dart Maps or Lists?",
+    "options": ["jsonEncode", "jsonDecode (from dart:convert)", "Parser.json", "HttpDecoder"],
+    "correctAnswer": "jsonDecode (from dart:convert)",
+    "explanation": "jsonDecode converts a JSON string into Map<String, dynamic> or List."
+  }
+]
