@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizMaster - App Features Walkthrough</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    canvas {
+      image-rendering: -webkit-optimize-contrast;
+      border-radius: 16px;
+    }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2">
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-2xl p-4 shadow-sm max-w-4xl mx-auto">
+    
+    <!-- Top Header -->
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[var(--border)] mb-3">
+      <div>
+        <h2 class="text-base font-bold text-[var(--foreground)] flex items-center gap-2">
+          <span>🎬</span> QuizMaster: 1-Minute Features Walkthrough
+        </h2>
+        <p class="text-xs text-[var(--muted-foreground)]">Pure feature demonstration with audio voiceover, animations, and video export</p>
+      </div>
+      <span class="text-xs px-2.5 py-1 bg-lime-500/10 text-lime-600 dark:text-lime-400 rounded-full font-bold border border-lime-500/20">
+        Duration: 60 Seconds
+      </span>
+    </div>
+
+    <!-- Video Stage -->
+    <div class="relative bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col items-center justify-center p-3">
+      <canvas id="featuresCanvas" width="800" height="450" class="w-full max-w-3xl aspect-video bg-slate-900"></canvas>
+      
+      <!-- Subtitles -->
+      <div id="subtitleBox" class="mt-2 w-full max-w-2xl px-4 py-2.5 bg-slate-900/90 backdrop-blur rounded-xl border border-slate-800 text-center">
+        <p id="captionText" class="text-xs text-lime-400 font-semibold tracking-wide transition-all duration-300">
+          Press "Play Video" below to watch and listen to the 1-minute feature demonstration.
+        </p>
+      </div>
+    </div>
+
+    <!-- Controls & Scrubber -->
+    <div class="mt-3 bg-[var(--surface-variant,rgba(150,150,150,0.08))] p-3 rounded-xl border border-[var(--border)] space-y-2">
+      <!-- Scrubber -->
+      <div class="flex items-center gap-3">
+        <span id="currentTime" class="text-xs font-mono font-bold text-[var(--foreground)] w-10">0:00</span>
+        <input type="range" id="progressBar" min="0" max="60" value="0" step="0.1" class="flex-1 accent-lime-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg">
+        <span class="text-xs font-mono font-bold text-[var(--muted-foreground)] w-10">1:00</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+        <div class="flex items-center gap-2">
+          <button id="playBtn" onclick="togglePlay()" class="px-5 py-2 bg-lime-500 hover:bg-lime-400 text-slate-950 font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+            <span id="playIcon">▶</span> <span id="playText">Play Video</span>
+          </button>
+          <button onclick="restartVideo()" class="px-3 py-2 bg-[var(--card)] hover:bg-[var(--border)] border border-[var(--border)] text-xs font-bold rounded-xl transition">
+            🔄 Restart
+          </button>
+          <button id="voiceToggle" onclick="toggleVoice()" class="px-3 py-2 bg-[var(--card)] hover:bg-[var(--border)] border border-[var(--border)] text-xs font-bold rounded-xl transition flex items-center gap-1">
+            <span id="voiceIcon">🔊</span> <span id="voiceText">Voice: ON</span>
+          </button>
+        </div>
+
+        <!-- Download Video Button -->
+        <button id="recordBtn" onclick="recordAndExport()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl border border-slate-700 shadow flex items-center gap-1.5">
+          <span>📹</span> <span id="recordText">Export Video (.webm)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 5 Feature Scene Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 mt-3 text-xs">
+      <div onclick="seekTo(0)" class="scene-card p-2 rounded-xl bg-slate-900/40 border border-[var(--border)] cursor-pointer hover:border-lime-500 transition">
+        <span class="text-lime-500 font-bold">0:00 - 0:12</span>
+        <p class="font-bold text-[var(--foreground)] mt-0.5">1. Subject Suggestions</p>
+        <p class="text-[11px] text-[var(--muted-foreground)]">Live autocomplete</p>
+      </div>
+      <div onclick="seekTo(12)" class="scene-card p-2 rounded-xl bg-slate-900/40 border border-[var(--border)] cursor-pointer hover:border-lime-500 transition">
+        <span class="text-lime-500 font-bold">0:12 - 0:24</span>
+        <p class="font-bold text-[var(--foreground)] mt-0.5">2. Quiz Setup</p>
+        <p class="text-[11px] text-[var(--muted-foreground)]">Timer & Q count</p>
+      </div>
+      <div onclick="seekTo(24)" class="scene-card p-2 rounded-xl bg-slate-900/40 border border-[var(--border)] cursor-pointer hover:border-lime-500 transition">
+        <span class="text-lime-500 font-bold">0:24 - 0:36</span>
+        <p class="font-bold text-[var(--foreground)] mt-0.5">3. Custom File Upload</p>
+        <p class="text-[11px] text-[var(--muted-foreground)]">JSON & Text files</p>
+      </div>
+      <div onclick="seekTo(36)" class="scene-card p-2 rounded-xl bg-slate-900/40 border border-[var(--border)] cursor-pointer hover:border-lime-500 transition">
+        <span class="text-lime-500 font-bold">0:36 - 0:48</span>
+        <p class="font-bold text-[var(--foreground)] mt-0.5">4. Live Timer Quiz</p>
+        <p class="text-[11px] text-[var(--muted-foreground)]">Countdown & timeout</p>
+      </div>
+      <div onclick="seekTo(48)" class="scene-card p-2 rounded-xl bg-slate-900/40 border border-[var(--border)] cursor-pointer hover:border-lime-500 transition">
+        <span class="text-lime-500 font-bold">0:48 - 1:00</span>
+        <p class="font-bold text-[var(--foreground)] mt-0.5">5. Review & Credits</p>
+        <p class="text-[11px] text-[var(--muted-foreground)]">Score & App credits</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('featuresCanvas');
+    const ctx = canvas.getContext('2d');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeLabel = document.getElementById('currentTime');
+    const captionText = document.getElementById('captionText');
+
+    let isPlaying = false;
+    let voiceEnabled = true;
+    let currentTime = 0;
+    let lastTimestamp = null;
+    let animId = null;
+    const synth = window.speechSynthesis;
+    let lastSpokenScene = -1;
+
+    // 5 Feature Scenes: Strictly features, concluding with tech credit at the very end
+    const scenes = [
+      {
+        start: 0,
+        end: 12,
+        title: "FEATURE 1: SMART SUBJECT AUTO-SUGGESTIONS",
+        subtitle: "In QuizMaster, users can type any subject and receive real-time auto-suggestions across computers, mathematics, general knowledge, and history.",
+        draw: (ctx, t) => drawScene1(ctx, t)
+      },
+      {
+        start: 12,
+        end: 24,
+        title: "FEATURE 2: FLEXIBLE QUIZ SETUP & TIMERS",
+        subtitle: "Before starting, users can customize their test by selecting the number of questions, difficulty level, and setting a dedicated countdown timer per question.",
+        draw: (ctx, t) => drawScene2(ctx, t)
+      },
+      {
+        start: 24,
+        end: 36,
+        title: "FEATURE 3: CUSTOM SUBJECT FILE UPLOADS",
+        subtitle: "Users can upload their own subject files in JSON or text formats, instantly loading custom syllabus questions for any subject.",
+        draw: (ctx, t) => drawScene3(ctx, t)
+      },
+      {
+        start: 36,
+        end: 48,
+        title: "FEATURE 4: LIVE COUNTDOWN TIMER & AUTO-ADVANCE",
+        subtitle: "During the quiz, a dynamic circular timer shifts color from green to red, automatically advancing if time runs out to test speed and accuracy.",
+        draw: (ctx, t) => drawScene4(ctx, t)
+      },
+      {
+        start: 48,
+        end: 60,
+        title: "FEATURE 5: SCORE SUMMARY & ANSWER REVIEW",
+        subtitle: "At the end, users get detailed accuracy scores and a full question review. This application is built using Flutter and powered by the Open Trivia REST API.",
+        draw: (ctx, t) => drawScene5(ctx, t)
+      }
+    ];
+
+    function togglePlay() {
+      if (isPlaying) {
+        pauseVideo();
+      } else {
+        playVideo();
+      }
+    }
+
+    function playVideo() {
+      if (currentTime >= 60) currentTime = 0;
+      isPlaying = true;
+      document.getElementById('playIcon').innerText = '⏸';
+      document.getElementById('playText').innerText = 'Pause';
+      lastTimestamp = performance.now();
+      requestAnimationFrame(loop);
+      speakCurrentScene();
+    }
+
+    function pauseVideo() {
+      isPlaying = false;
+      document.getElementById('playIcon').innerText = '▶';
+      document.getElementById('playText').innerText = 'Play Video';
+      if (synth) synth.cancel();
+      if (animId) cancelAnimationFrame(animId);
+    }
+
+    function restartVideo() {
+      pauseVideo();
+      currentTime = 0;
+      lastSpokenScene = -1;
+      updateUI();
+      renderFrame();
+    }
+
+    function seekTo(sec) {
+      currentTime = sec;
+      lastSpokenScene = -1;
+      updateUI();
+      renderFrame();
+      if (isPlaying) speakCurrentScene();
+    }
+
+    progressBar.addEventListener('input', (e) => {
+      currentTime = parseFloat(e.target.value);
+      lastSpokenScene = -1;
+      updateUI();
+      renderFrame();
+      if (isPlaying) speakCurrentScene();
+    });
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      document.getElementById('voiceText').innerText = voiceEnabled ? 'Voice: ON' : 'Voice: MUTED';
+      document.getElementById('voiceIcon').innerText = voiceEnabled ? '🔊' : '🔇';
+      if (!voiceEnabled && synth) synth.cancel();
+      else if (isPlaying) speakCurrentScene();
+    }
+
+    function speakCurrentScene() {
+      if (!voiceEnabled || !synth) return;
+      const sceneIndex = scenes.findIndex(s => currentTime >= s.start && currentTime < s.end);
+      if (sceneIndex !== -1 && sceneIndex !== lastSpokenScene) {
+        lastSpokenScene = sceneIndex;
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(scenes[sceneIndex].subtitle);
+        utter.rate = 1.05;
+        synth.speak(utter);
+      }
+    }
+
+    function loop(now) {
+      if (!isPlaying) return;
+      const delta = (now - lastTimestamp) / 1000;
+      lastTimestamp = now;
+
+      currentTime += delta;
+      if (currentTime >= 60) {
+        currentTime = 60;
+        pauseVideo();
+        updateUI();
+        renderFrame();
+        return;
+      }
+
+      updateUI();
+      renderFrame();
+      speakCurrentScene();
+      animId = requestAnimationFrame(loop);
+    }
+
+    function updateUI() {
+      progressBar.value = currentTime;
+      const mins = Math.floor(currentTime / 60);
+      const secs = Math.floor(currentTime % 60);
+      currentTimeLabel.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+      const activeScene = scenes.find(s => currentTime >= s.start && currentTime < s.end) || scenes[scenes.length - 1];
+      captionText.innerText = activeScene.subtitle;
+    }
+
+    function renderFrame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const activeScene = scenes.find(s => currentTime >= s.start && currentTime < s.end) || scenes[scenes.length - 1];
+      activeScene.draw(ctx, currentTime);
+
+      // Top HUD Bar
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+      ctx.fillRect(0, 0, canvas.width, 42);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, canvas.width, 42);
+
+      // App Title
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = '#CCF638';
+      ctx.fillText('📱 QuizMaster Features', 20, 26);
+
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(`• ${activeScene.title}`, 200, 26);
+
+      // Timer pill
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(canvas.width - 110, 10, 90, 24, 12);
+      ctx.fill();
+      ctx.fillStyle = '#CCF638';
+      ctx.font = 'bold 12px monospace';
+      const secs = Math.floor(currentTime);
+      ctx.fillText(`00:${secs < 10 ? '0' : ''}${secs} / 60s`, canvas.width - 100, 26);
+    }
+
+    // SCENE 1: SUBJECT AUTO-SUGGESTIONS
+    function drawScene1(ctx, t) {
+      const grad = ctx.createLinearGradient(0, 0, 800, 450);
+      grad.addColorStop(0, '#091522');
+      grad.addColorStop(1, '#0F172A');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 450);
+
+      // Left Phone Mockup
+      drawPhoneShell(ctx, 80, 70, 220, 350);
+      
+      // Top Greeting
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('Good morning, Student', 95, 110);
+
+      // Autocomplete Search input
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.roundRect(95, 125, 190, 36, 10);
+      ctx.fill();
+      ctx.fillStyle = '#334155';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('🔍 Science: Comp|', 105, 148);
+
+      // Live Suggestions Dropdown
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(95, 170, 190, 140, 12);
+      ctx.fill();
+      ctx.strokeStyle = '#38BDF8';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#CCF638';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('Smart Suggestions:', 108, 192);
+      
+      ctx.fillStyle = '#E2E8F0';
+      ctx.font = '10px sans-serif';
+      ctx.fillText('• Science: Computers & IT', 108, 216);
+      ctx.fillText('• Science: Mathematics', 108, 238);
+      ctx.fillText('• Science: Gadgets & Tech', 108, 260);
+      ctx.fillText('• Computer Science & OS', 108, 282);
+
+      // Right Explanation Cards
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('Smart Subject Auto-Suggestions', 340, 105);
+      ctx.fillStyle = '#38BDF8';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('Instant Search Across All Categories', 340, 130);
+
+      drawFeatureBox(ctx, 340, 155, 420, 52, '🔍', 'Live Typeahead Search', 'Type any topic to get matching recommendations instantly');
+      drawFeatureBox(ctx, 340, 222, 420, 52, '📚', 'Broad Subject Catalog', 'Computers, Math, General Knowledge, Science, and History');
+      drawFeatureBox(ctx, 340, 289, 420, 52, '⚡', 'One-Tap Selection', 'Tap any suggestion to load the quiz immediately');
+    }
+
+    // SCENE 2: QUIZ CONFIGURATION
+    function drawScene2(ctx, t) {
+      const grad = ctx.createLinearGradient(0, 0, 800, 450);
+      grad.addColorStop(0, '#0B0F19');
+      grad.addColorStop(1, '#111827');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 450);
+
+      // Left Phone Mockup showing Question & Timer selectors
+      drawPhoneShell(ctx, 80, 70, 220, 350);
+      
+      // Question count selection
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('Number of Questions', 95, 115);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(95, 125, 40, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('5', 110, 144);
+
+      // 10 Selected
+      ctx.fillStyle = '#CCF638';
+      ctx.beginPath();
+      ctx.roundRect(145, 125, 40, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('10', 158, 144);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(195, 125, 40, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('15', 208, 144);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(245, 125, 40, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('20', 258, 144);
+
+      // Timer Selection
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('Timer Per Question', 95, 180);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(95, 190, 40, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText('10s', 105, 209);
+
+      // 15s Selected
+      ctx.fillStyle = '#1E293B';
+      ctx.strokeStyle = '#CCF638';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(145, 190, 40, 30, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#CCF638';
+      ctx.fillText('15s', 155, 209);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(195, 190, 40, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText('20s', 205, 209);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(245, 190, 40, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText('30s', 255, 209);
+
+      // Start Button
+      ctx.fillStyle = '#CCF638';
+      ctx.beginPath();
+      ctx.roundRect(95, 250, 190, 42, 21);
+      ctx.fill();
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('Start Quiz Now ▶', 140, 276);
+
+      // Right Explanation Cards
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('Customizable Quiz Setup', 340, 105);
+      ctx.fillStyle = '#CCF638';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('Tailor Every Quiz Session', 340, 130);
+
+      drawFeatureBox(ctx, 340, 155, 420, 52, '🔢', 'Question Count Selector', 'Choose 5, 10, 15, or 20 questions based on available time');
+      drawFeatureBox(ctx, 340, 222, 420, 52, '⏱️', 'Per-Question Timer', 'Select 10s, 15s, 20s, or 30s per individual question');
+      drawFeatureBox(ctx, 340, 289, 420, 52, '🎯', 'Difficulty Filtering', 'Filter questions by Easy, Medium, Hard, or Any difficulty');
+    }
+
+    // SCENE 3: CUSTOM FILE UPLOADS
+    function drawScene3(ctx, t) {
+      const grad = ctx.createLinearGradient(0, 0, 800, 450);
+      grad.addColorStop(0, '#0F1E17');
+      grad.addColorStop(1, '#0F172A');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 450);
+
+      // Left Phone Mockup showing Custom Files
+      drawPhoneShell(ctx, 80, 70, 220, 350);
+      ctx.fillStyle = '#CCF638';
+      ctx.beginPath();
+      ctx.roundRect(95, 115, 190, 65, 14);
+      ctx.fill();
+      ctx.fillStyle = '#0F172A';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('📁 Custom Quiz Vault', 105, 138);
+      ctx.font = '10px sans-serif';
+      ctx.fillText('Upload .json or .txt questions', 105, 158);
+
+      // File items
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(95, 190, 190, 40, 10);
+      ctx.fill();
+      ctx.fillStyle = '#E2E8F0';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('📄 flutter_lab.json (10 Qs)', 105, 214);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(95, 238, 190, 40, 10);
+      ctx.fill();
+      ctx.fillStyle = '#E2E8F0';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('📄 dbms_exam.txt (8 Qs)', 105, 262);
+
+      // Right Explanation
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('Custom Subject File Uploads', 340, 105);
+      ctx.fillStyle = '#4ADE80';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('Import Any Syllabus into the App', 340, 130);
+
+      drawFeatureBox(ctx, 340, 155, 420, 52, '📂', 'Multi-Format File Picker', 'Select files directly from device storage (.json or .txt)');
+      drawFeatureBox(ctx, 340, 222, 420, 52, '📋', 'Direct Paste Import', 'Paste question sets directly with a built-in sample template');
+      drawFeatureBox(ctx, 340, 289, 420, 52, '💾', 'Subject Library', 'Uploaded files are automatically saved for future practice');
+    }
+
+    // SCENE 4: LIVE TIMER & ACTIVE QUIZ
+    function drawScene4(ctx, t) {
+      const grad = ctx.createLinearGradient(0, 0, 800, 450);
+      grad.addColorStop(0, '#1E120D');
+      grad.addColorStop(1, '#0F172A');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 450);
+
+      // Left Phone Mockup showing Quiz Screen with Timer
+      drawPhoneShell(ctx, 80, 70, 220, 350);
+      
+      // Timer badge
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(190, 100, 95, 22, 11);
+      ctx.fill();
+      ctx.fillStyle = '#F59E0B';
+      ctx.font = 'bold 10px monospace';
+      ctx.fillText('⏱️ 08s / 15s', 200, 115);
+
+      // Question card
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.roundRect(95, 130, 190, 75, 12);
+      ctx.fill();
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('Question 3 of 10', 105, 150);
+      ctx.font = '10px sans-serif';
+      ctx.fillText('Which widget handles swipe', 105, 170);
+      ctx.fillText('gestures to delete in lists?', 105, 185);
+
+      // Options
+      drawPhoneOption(ctx, 95, 215, 'A', 'Draggable', false);
+      drawPhoneOption(ctx, 95, 245, 'B', 'Dismissible', true);
+      drawPhoneOption(ctx, 95, 275, 'C', 'GestureBox', false);
+
+      // Right Explanation
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('Live Countdown Timer & Gestures', 340, 105);
+      ctx.fillStyle = '#F59E0B';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('Real-Time Speed & Precision Testing', 340, 130);
+
+      drawFeatureBox(ctx, 340, 155, 420, 52, '⏱️', 'Color-Shifting Countdown', 'Changes Green (>45%) -> Amber -> Coral Red as time winds down');
+      drawFeatureBox(ctx, 340, 222, 420, 52, '⏩', 'Auto-Advance on Timeout', 'Automatically advances if time expires to keep tests moving');
+      drawFeatureBox(ctx, 340, 289, 420, 52, '🛡️', 'Quit Confirmation Guard', 'Alert dialog protects users from accidentally losing progress');
+    }
+
+    // SCENE 5: SCORE SUMMARY, REVIEW & TECH CREDITS
+    function drawScene5(ctx, t) {
+      const grad = ctx.createLinearGradient(0, 0, 800, 450);
+      grad.addColorStop(0, '#1E1B4B');
+      grad.addColorStop(1, '#0F172A');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 450);
+
+      // Left Phone Mockup showing Score & Review
+      drawPhoneShell(ctx, 80, 70, 220, 350);
+      ctx.fillStyle = '#CCF638';
+      ctx.beginPath();
+      ctx.roundRect(95, 105, 190, 80, 14);
+      ctx.fill();
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('QUIZ SUMMARY', 105, 124);
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText('8 / 10', 105, 154);
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('80% Accuracy (Passed)', 105, 174);
+
+      // Review Card
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(95, 195, 190, 45, 10);
+      ctx.fill();
+      ctx.fillStyle = '#4ADE80';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('✓ Correct: 8 Questions', 105, 215);
+      ctx.fillStyle = '#F87171';
+      ctx.fillText('✕ Incorrect: 2 Questions', 105, 230);
+
+      // Review Answers Button
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.roundRect(95, 250, 190, 35, 10);
+      ctx.fill();
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('Review All Answers →', 135, 272);
+
+      // Right Explanation Cards (Features + Final Tech Credits at Last)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('Score Analytics & Review Mode', 340, 100);
+      ctx.fillStyle = '#A78BFA';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('Comprehensive Performance Feedback', 340, 122);
+
+      drawFeatureBox(ctx, 340, 145, 420, 50, '📊', 'Accuracy & Stats Breakdown', 'View correct, wrong, timed-out counts, and elapsed time');
+      drawFeatureBox(ctx, 340, 205, 420, 50, '📝', 'Full Answer Review', 'Inspect what you chose versus the actual correct answer');
+
+      // Final Tech Credit Banner at Last
+      ctx.fillStyle = '#CCF638';
+      ctx.beginPath();
+      ctx.roundRect(340, 268, 420, 68, 14);
+      ctx.fill();
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('⚡ BUILT USING FLUTTER & DART', 355, 293);
+      ctx.font = '12px sans-serif';
+      ctx.fillText('Powered by the Open Trivia REST API (OpenTDB)', 355, 315);
+    }
+
+    // Helper functions
+    function drawPhoneShell(ctx, x, y, w, h) {
+      ctx.fillStyle = '#020617';
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 28);
+      ctx.fill();
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Top Notch
+      ctx.fillStyle = '#0F172A';
+      ctx.beginPath();
+      ctx.roundRect(x + w / 2 - 25, y + 8, 50, 12, 6);
+      ctx.fill();
+    }
+
+    function drawPhoneOption(ctx, x, y, letter, text, isSelected) {
+      ctx.fillStyle = isSelected ? '#CCF638' : '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(x, y, 190, 24, 8);
+      ctx.fill();
+      ctx.fillStyle = isSelected ? '#111827' : '#E2E8F0';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText(`[${letter}] ${text}`, x + 10, y + 16);
+    }
+
+    function drawFeatureBox(ctx, x, y, w, h, icon, title, desc) {
+      ctx.fillStyle = 'rgba(30, 41, 59, 0.75)';
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 12);
+      ctx.fill();
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.font = '18px sans-serif';
+      ctx.fillText(icon, x + 12, y + 33);
+
+      ctx.fillStyle = '#F8FAFC';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(title, x + 44, y + 23);
+
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '11px sans-serif';
+      ctx.fillText(desc, x + 44, y + 40);
+    }
+
+    // Video Exporter (.webm)
+    function recordAndExport() {
+      if (typeof MediaRecorder === 'undefined') {
+        alert('MediaRecorder is not supported in this browser environment.');
+        return;
+      }
+
+      const stream = canvas.captureStream(30);
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'QuizMaster_Features_Demo.webm';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        document.getElementById('recordText').innerText = 'Export Video (.webm)';
+      };
+
+      restartVideo();
+      recorder.start();
+      document.getElementById('recordText').innerText = '🔴 Recording (60s)...';
+
+      playVideo();
+
+      const checkInterval = setInterval(() => {
+        if (currentTime >= 60 || !isPlaying) {
+          recorder.stop();
+          clearInterval(checkInterval);
+        }
+      }, 500);
+    }
+
+    // Initial draw
+    renderFrame();
+  </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# 📱 QuizMaster — Flutter Lab External Exam Project
+# 📱 Smart Quiz — Flutter Lab External Exam Project
 
 > A modern, high-contrast Flutter Quiz Application built with a **Neobank/Fintech UI design** (lime-green accents, rounded cards, clean typography). It connects to the **Open Trivia Database REST API**, supports **custom file uploads** (.json and text formats), live **per-question countdown timers**, **high score leaderboards** via local persistence, and an interactive **lab exam viva guide**.
 

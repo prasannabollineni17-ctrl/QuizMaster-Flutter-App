@@ -18,16 +18,16 @@ void main() {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  runApp(const QuizMasterApp());
+  runApp(const SmartQuizApp());
 }
 
-class QuizMasterApp extends StatelessWidget {
-  const QuizMasterApp({super.key});
+class SmartQuizApp extends StatelessWidget {
+  const SmartQuizApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'QuizMaster - Lab Exam Ready',
+      title: 'Smart Quiz',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const MainNavigationShell(),
