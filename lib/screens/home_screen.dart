@@ -32,8 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedQuestionCount = 10;
   int _selectedTimerSeconds = 15;
   String _selectedDifficulty = 'any';
-  String _playerName = 'Student';
-
   final List<int> _questionCountOptions = [5, 10, 15, 20];
   final List<int> _timerOptions = [10, 15, 20, 30];
   final List<String> _difficultyOptions = ['any', 'easy', 'medium', 'hard'];
@@ -49,10 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadCustomSubjectsAndUser() async {
-    final name = await LocalStorageService.getPlayerName();
     final customFiles = await LocalStorageService.getCustomSubjects();
     setState(() {
-      _playerName = name;
       _customSavedFiles = customFiles;
       // Add custom uploaded subjects into subject list
       final customCategories = customFiles.entries.map(
@@ -181,9 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Good morning, $_playerName',
-              style: const TextStyle(
+            const Text(
+              'Welcome to Smart Quiz',
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.textDark,
