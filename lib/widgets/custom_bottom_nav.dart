@@ -35,8 +35,6 @@ class CustomBottomNav extends StatelessWidget {
           children: [
             _buildNavItem(0, Icons.grid_view_rounded, 'Quiz'),
             _buildNavItem(1, Icons.folder_open_rounded, 'Files'),
-            _buildNavItem(2, Icons.leaderboard_rounded, 'Scores'),
-            _buildNavItem(3, Icons.school_rounded, 'Viva Guide'),
           ],
         ),
       ),
@@ -51,7 +49,7 @@ class CustomBottomNav extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.surfaceDark : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
@@ -71,7 +69,7 @@ class CustomBottomNav extends StatelessWidget {
                 style: const TextStyle(
                   color: AppTheme.textLight,
                   fontWeight: FontWeight.w700,
-                  fontSize: 12,
+                  fontSize: 13,
                 ),
               ),
             ],

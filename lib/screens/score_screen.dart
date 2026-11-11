@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import '../models/leaderboard_entry.dart';
 import '../models/question_model.dart';
 import '../models/quiz_config.dart';
-import '../services/local_storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/neobank_card.dart';
 import '../widgets/pill_button.dart';
 import 'answer_review_screen.dart';
 import 'quiz_screen.dart';
 
-class ScoreScreen extends StatefulWidget {
+class ScoreScreen extends StatelessWidget {
   final List<QuestionModel> questions;
   final int score;
   final int totalQuestions;
@@ -28,66 +26,14 @@ class ScoreScreen extends StatefulWidget {
   });
 
   @override
-  State<ScoreScreen> createState() => _ScoreScreenState();
-}
-
-class _ScoreScreenState extends State<ScoreScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  bool _isSaved = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadInitialName();
-  }
-
-  Future<void> _loadInitialName() async {
-    final name = await LocalStorageService.getPlayerName();
-    _nameController.text = name;
-  }
-
-  Future<void> _saveToLeaderboard() async {
-    final playerName = _nameController.text.trim().isEmpty
-        ? 'Anonymous Student'
-        : _nameController.text.trim();
-
-    await LocalStorageService.savePlayerName(playerName);
-
-    final entry = LeaderboardEntry(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      playerName: playerName,
-      subject: widget.subjectName,
-      score: widget.score,
-      totalQuestions: widget.totalQuestions,
-      totalTimeSeconds: widget.totalTimeSeconds,
-      date: DateTime.now(),
-    );
-
-    await LocalStorageService.saveScore(entry);
-
-    setState(() {
-      _isSaved = true;
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('🏆 High score successfully saved to Leaderboard!'),
-          backgroundColor: AppTheme.success,
-        ),
-      );
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final percentage = widget.totalQuestions > 0
-        ? ((widget.score / widget.totalQuestions) * 100).round()
+    final percentage = totalQuestions > 0
+        ? ((score / totalQuestions) * 100).round()
         : 0;
 
     int timedOutCount = 0;
     int incorrectCount = 0;
-    for (var q in widget.questions) {
+    for (var q in questions) {
       if (q.isTimedOut) {
         timedOutCount++;
       } else if (!q.isCorrect) {
@@ -128,7 +74,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        widget.subjectName.toUpperCase(),
+                        subjectName.toUpperCase(),
                         style: const TextStyle(
                           color: AppTheme.limeAccent,
                           fontSize: 10,
@@ -138,7 +84,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '${widget.score} / ${widget.totalQuestions}',
+                      '$score / $totalQuestions',
                       style: const TextStyle(
                         fontSize: 48,
                         fontWeight: FontWeight.w900,
@@ -174,7 +120,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   Expanded(
                     child: _buildStatItem(
                       label: 'Correct',
-                      value: '${widget.score}',
+                      value: '$score',
                       color: AppTheme.success,
                       icon: Icons.check_circle_rounded,
                     ),
@@ -201,66 +147,14 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   Expanded(
                     child: _buildStatItem(
                       label: 'Total Time',
-                      value: '${widget.totalTimeSeconds}s',
+                      value: '${totalTimeSeconds}s',
                       color: AppTheme.surfaceDark,
                       icon: Icons.timer_outlined,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              // Save to Leaderboard Section
-              NeobankCard(
-                variant: CardVariant.white,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Save to High Scores',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textDark,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Record this score on your local device leaderboard',
-                      style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _nameController,
-                            enabled: !_isSaved,
-                            decoration: InputDecoration(
-                              hintText: 'Enter student name',
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                              filled: true,
-                              fillColor: AppTheme.background,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        PillButton(
-                          label: _isSaved ? 'Saved ✓' : 'Save',
-                          variant: _isSaved ? PillButtonVariant.outline : PillButtonVariant.dark,
-                          onPressed: _isSaved ? null : _saveToLeaderboard,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
 
               // Actions
               PillButton(
@@ -272,7 +166,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AnswerReviewScreen(questions: widget.questions),
+                      builder: (context) => AnswerReviewScreen(questions: questions),
                     ),
                   );
                 },
@@ -289,7 +183,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => QuizScreen(config: widget.config),
+                            builder: (context) => QuizScreen(config: config),
                           ),
                         );
                       },

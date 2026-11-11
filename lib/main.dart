@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/file_subjects_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/leaderboard_screen.dart';
-import 'screens/viva_guide_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/custom_bottom_nav.dart';
 
@@ -58,8 +56,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         onNavigateToFiles: () => _onTabSelected(1),
       ),
       const FileSubjectsScreen(),
-      const LeaderboardScreen(),
-      const VivaGuideScreen(),
     ];
 
     return Scaffold(
